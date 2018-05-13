@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.sukowidodo.rxandroid.model.ProductsItem
+import com.sukowidodo.rxandroid.model.Response
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -18,21 +19,25 @@ class KonekActivity : AppCompatActivity() {
         setContentView(R.layout.activity_konek)
         setSupportActionBar(toolbar)
 
-        val retroclient : Retrofit = RetroClient().getRetrofitInstance()
-        val service: RetrofitInterface = retroclient.create(RetrofitInterface::class.java)
+        val service: RetrofitInterface = RetroClient.getRetrofitInstance().create(RetrofitInterface::class.java)
+        getProduct(service)
+
+    }
+
+    fun getProduct(service : RetrofitInterface){
         service.getProducts()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {result->
-                            val listWithNulls: List<ProductsItem?>? = result.products
-                            listWithNulls.forEach { productsItem: ProductsItem? -> Unit }
+                .subscribe(this::HandleResponse,this::HandleError)
+    }
 
-                        },
-                        {error ->
-                            Log.e("error",error.message)
-                        })
+    fun HandleResponse(response: Response){
+        val arai : List<ProductsItem?>? = response.products
+        Log.d("Data", arai!![0].name)
+    }
 
+    fun HandleError(error:Throwable){
+        Log.e("Error",error.message)
     }
 
 }
