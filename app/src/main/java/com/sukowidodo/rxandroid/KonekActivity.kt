@@ -1,16 +1,15 @@
 package com.sukowidodo.rxandroid
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.util.Log.d
 import com.sukowidodo.rxandroid.model.ProductsItem
 import com.sukowidodo.rxandroid.model.Response
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_konek.*
-import retrofit2.Retrofit
 
 class KonekActivity : AppCompatActivity() {
 
@@ -28,12 +27,20 @@ class KonekActivity : AppCompatActivity() {
         service.getProducts()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::HandleResponse,this::HandleError)
+                .subscribe(
+                        this::HandleResponse,
+                        this::HandleError
+                )
     }
 
     fun HandleResponse(response: Response){
         val arai : List<ProductsItem?>? = response.products
-        Log.d("Data", arai!![0].name)
+        /*d("Data", arai!!.get(0)?.name)*/
+        arai?.forEach { ar ->
+            d("Data Nama", ar!!.name)
+            d("Data ProductId", ar!!.image)
+        }
+
     }
 
     fun HandleError(error:Throwable){
